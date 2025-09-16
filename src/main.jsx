@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createConfig, WagmiConfig, useAccount, useSwitchChain, useContractWrite, useWaitForTransaction } from 'wagmi';
+import { createConfig, WagmiConfig, useAccount, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { createPublicClient, http } from 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -143,9 +143,9 @@ function App() {
     // For single-player: functionName: 'resetGame'
   });
 
-  useWaitForTransaction({
+  useWaitForTransactionReceipt({
     hash: moveData?.hash,
-    onSuccess: async () => {
+    onSuccess: async (receipt) => {
       await updateGameState();
       await updateLeaderboard();
       sdk.haptics.impactOccurred('light');
