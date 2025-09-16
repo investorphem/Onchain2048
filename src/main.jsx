@@ -7,7 +7,7 @@ import { createPublicClient, http } from 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
-import { farcasterMiniApp as miniAppConnector } from '@farcaster/miniapp-wagmi-connector';
+import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 
 // Contract details
 const CONTRACT_ADDRESS = '0x2B204747b90e49791674B7b89F464476C9670eD7';
@@ -38,7 +38,7 @@ const ABI = [
 ];
 */
 
-// Wagmi Config with Farcaster Mini App Connector
+// Wagmi Config with Farcaster Frame Connector
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
@@ -47,7 +47,7 @@ const publicClient = createPublicClient({
 const config = createConfig({
   chains: [base],
   client: ({ chain }) => publicClient,
-  connectors: [miniAppConnector()],
+  connectors: [farcasterFrame()],
 });
 
 const queryClient = new QueryClient();
@@ -196,7 +196,7 @@ function App() {
 
   // Connect button handler
   const handleConnect = () => {
-    connect({ connector: miniAppConnector() });
+    connect({ connector: farcasterFrame() });
   };
 
   const tileClasses = (i, val) => {
@@ -213,7 +213,7 @@ function App() {
   return (
     <div>
       <h1>On-Chain 2048 on Base</h1>
-      <p>Score: {score} | High Score: {highScore} | Wallet: {address ? `${address.slice(0,6)}...` : 'Connecting...'}</p>
+      <p>Score: {score} | High Score: {highScore} | Wallet: {address ? `${address.slice(0,6)}...` : 'Not Connected'}</p>
       {!isConnected && <button onClick={handleConnect}>Connect Wallet</button>}
       {error && <p className="error">{error}</p>}
       {gameOver && <p>Game Over! Final Score: {score}</p>}
