@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@farcaster/miniapp-sdk": "^0.1.10",
-    "@farcaster/miniapp-wagmi-connector": "^0.1.0",
+    "@farcaster/frame-wagmi-connector": "^0.0.46",
     "@tanstack/react-query": "^5.59.15",
     "ethers": "^6.13.2",
     "wagmi": "^2.12.9",
