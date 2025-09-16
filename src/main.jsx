@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createConfig, WagmiConfig, useAccount, useSwitchChain, useContractRead, useContractWrite, useWaitForTransaction } from 'wagmi';
+import { createConfig, WagmiConfig, useAccount, useSwitchChain, useContractWrite, useWaitForTransaction } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { createPublicClient, http } from 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 
@@ -36,12 +36,15 @@ const ABI = [
 ];
 */
 
-// Wagmi Config
+// Wagmi Config with Viem
+const publicClient = createPublicClient({
+  chain: base,
+  transport: http(),
+});
+
 const config = createConfig({
   chains: [base],
-  transports: {
-    [base.id]: publicProvider(),
-  },
+  client: ({ chain }) => publicClient,
 });
 
 const queryClient = new QueryClient();
@@ -63,7 +66,7 @@ function App() {
     async function initProvider() {
       try {
         const ethProvider = await sdk.wallet.getEthereumProvider({ chainId: base.id });
-        const web3Provider = new ethers.providers.Web3Provider(ethProvider);
+        const web3Provider = new ethers.BrowserProvider(ethProvider);
         setProvider(web3Provider);
         await web3Provider.send('wallet_switchEthereumChain', [{ chainId: '0x2105' }]);
       } catch (err) {
@@ -73,7 +76,7 @@ function App() {
     if (!provider) initProvider(); // Connect once
   }, []);
 
-  const contract = provider ? new ethers.Contract(CONTRACT_ADDRESS, ABI, provider.getSigner()) : null;
+  const contract = provider ? new ethers.Contract(CONTRACT_ADDRESS, ABI, await provider.getSigner()) : null;
 
   // Initialize
   useEffect(() => {
@@ -89,10 +92,10 @@ function App() {
       const boardData = await contract.getMyBoard();
       setPrevBoard(board);
       setBoard(boardData.map(b => Number(b)));
-      const currentScore = (await contract.getMyScore()).toNumber();
+      const currentScore = Number(await contract.getMyScore());
       setScore(currentScore);
       setGameOver(await contract.getMyGameOver());
-      const currentHigh = (await contract.getHighScore(address)).toNumber();
+      const currentHigh = Number(await contract.getHighScore(address));
       setHighScore(currentHigh);
       if (currentScore > currentHigh) {
         sdk.notifications.schedule({
@@ -110,18 +113,17 @@ function App() {
   const updateLeaderboard = async () => {
     if (!contract) return;
     try {
-      const count = (await contract.getPlayersCount()).toNumber();
+      const count = Number(await contract.getPlayersCount());
       const entries = [];
-      for (let i = 0; i < count && i < 50; i++) { // Limit to 50 for gas
+      for (let i = 0; i < count && i < 50; i++) {
         const player = await contract.players(i);
-        const hs = (await contract.getHighScore(player)).toNumber();
+        const hs = Number(await contract.getHighScore(player));
         if (hs > 0) entries.push({ player, score: hs });
       }
       entries.sort((a, b) => b.score - a.score);
       setLeaderboard(entries.slice(0, 10));
     } catch (err) {
       console.error('Leaderboard fetch failed:', err);
-      // Fallback for single-player
       if (address && highScore > 0) setLeaderboard([{ player: address, score: highScore }]);
     }
   };
@@ -157,7 +159,7 @@ function App() {
       return;
     }
     try {
-      moveWrite({ args: [direction], gasLimit: 150000 });
+      moveWrite({ args: [direction], gasLimit: 150000n });
     } catch (err) {
       setError('Move failed: ' + err.message);
     }
@@ -165,7 +167,7 @@ function App() {
 
   const resetGame = async () => {
     try {
-      resetWrite({ gasLimit: 100000 });
+      resetWrite({ gasLimit: 100000n });
       await updateGameState();
       await updateLeaderboard();
     } catch (err) {
