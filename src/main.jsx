@@ -9,24 +9,8 @@ import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
 import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 
-// Contract details
+// Contract details - SINGLE-PLAYER ABI (matches deployed contract)
 const CONTRACT_ADDRESS = '0x2B204747b90e49791674B7b89F464476C9670eD7';
-const ABI = [
-  "function startOrResetGame()",
-  "function move(uint256 direction)",
-  "function getMyBoard() view returns (uint128[16])",
-  "function getMyScore() view returns (uint256)",
-  "function getMyGameOver() view returns (bool)",
-  "function getHighScore(address player) view returns (uint256)",
-  "function getPlayersCount() view returns (uint256)",
-  "function players(uint256 index) view returns (address)",
-  "event MoveMade(address indexed player, uint256 direction, uint256 newScore)",
-  "event NewTileAdded(address indexed player, uint256 position, uint256 value)",
-  "event HighScoreUpdated(address indexed player, uint256 newHighScore)"
-];
-
-// For single-player contract (uncomment if needed):
-/*
 const ABI = [
   "function resetGame()",
   "function move(uint256 direction)",
@@ -36,7 +20,6 @@ const ABI = [
   "event MoveMade(uint256 direction, uint256 newScore)",
   "event NewTileAdded(uint256 position, uint256 value)"
 ];
-*/
 
 // Wagmi Config with Farcaster Frame Connector
 const publicClient = createPublicClient({
@@ -65,7 +48,7 @@ function App() {
   const { connect } = useConnect();
   const { switchChain } = useSwitchChain();
 
-  // Persistent provider and signer (now handled by Wagmi connector)
+  // Persistent provider and signer
   const [provider, setProvider] = useState(null);
   useEffect(() => {
     async function initProvider() {
@@ -78,6 +61,7 @@ function App() {
         setProvider(web3Provider);
         const signer = await web3Provider.getSigner();
         setContract(new ethers.Contract(CONTRACT_ADDRESS, ABI, signer));
+        setError(null); // Clear errors on successful init
       } catch (err) {
         setError('Wallet setup failed: ' + err.message);
       }
@@ -94,19 +78,18 @@ function App() {
     updateLeaderboard();
   }, [isConnected, contract]);
 
-  // Game state
+  // Game state - with error handling for reverts
   const updateGameState = async () => {
     if (!contract || !address) return;
     try {
-      const boardData = await contract.getMyBoard();
+      const boardData = await contract.getBoard();
       setPrevBoard(board);
       setBoard(boardData.map(b => Number(b)));
-      const currentScore = Number(await contract.getMyScore());
+      const currentScore = Number(await contract.score());
       setScore(currentScore);
-      setGameOver(await contract.getMyGameOver());
-      const currentHigh = Number(await contract.getHighScore(address));
-      setHighScore(currentHigh);
-      if (currentScore > currentHigh) {
+      setGameOver(await contract.gameOver());
+      setHighScore(currentScore); // For single-player, use current score as high score
+      if (currentScore > highScore) {
         sdk.notifications.schedule({
           title: "New High Score in 2048!",
           body: `You achieved ${currentScore}! Keep going!`,
@@ -114,26 +97,24 @@ function App() {
         });
       }
     } catch (err) {
-      setError('Failed to fetch game state: ' + err.message);
+      if (err.code === 'CALL_EXCEPTION' || err.reason?.includes('revert')) {
+        setError('Contract call failed (possible ABI mismatch)—check if contract supports these functions. Error: ' + err.message);
+      } else {
+        setError('Failed to fetch game state: ' + err.message);
+      }
     }
   };
 
-  // Leaderboard
+  // Leaderboard - fallback for single-player
   const updateLeaderboard = async () => {
-    if (!contract) return;
+    if (!contract || !address) return;
     try {
-      const count = Number(await contract.getPlayersCount());
-      const entries = [];
-      for (let i = 0; i < count && i < 50; i++) {
-        const player = await contract.players(i);
-        const hs = Number(await contract.getHighScore(player));
-        if (hs > 0) entries.push({ player, score: hs });
-      }
-      entries.sort((a, b) => b.score - a.score);
-      setLeaderboard(entries.slice(0, 10));
+      // For single-player, just show current user's score
+      const currentScore = Number(await contract.score());
+      setLeaderboard([{ player: address, score: currentScore }]);
     } catch (err) {
       console.error('Leaderboard fetch failed:', err);
-      if (address && highScore > 0) setLeaderboard([{ player: address, score: highScore }]);
+      if (address && score > 0) setLeaderboard([{ player: address, score: score }]);
     }
   };
 
@@ -147,8 +128,7 @@ function App() {
   const { write: resetWrite } = useContractWrite({
     address: CONTRACT_ADDRESS,
     abi: ABI,
-    functionName: 'startOrResetGame',
-    // For single-player: functionName: 'resetGame'
+    functionName: 'resetGame', // Single-player function
   });
 
   useWaitForTransactionReceipt({
@@ -177,10 +157,15 @@ function App() {
   const resetGame = async () => {
     try {
       resetWrite({ gasLimit: 100000n });
-      await updateGameState();
+      // Wait a bit for tx to process before updating
+      setTimeout(() => updateGameState(), 2000);
       await updateLeaderboard();
     } catch (err) {
-      setError('Reset failed: ' + err.message);
+      if (err.message.includes('G is not a function') || err.code === 'CALL_EXCEPTION') {
+        setError('Reset failed due to ABI mismatch or function not found. Ensure contract supports resetGame(). Error: ' + err.message);
+      } else {
+        setError('Reset failed: ' + err.message);
+      }
     }
   };
 
