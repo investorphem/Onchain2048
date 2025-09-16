@@ -1,0 +1,17 @@
+{
+  "version": "1",
+  "name": "On-Chain 2048",
+  "iconUrl": "https://onchain2048.vercel.app/icon.png",
+  "homeUrl": "https://onchain2048.vercel.app/",
+  "imageUrl": "https://onchain2048.vercel.app/og-image.png",
+  "buttonTitle": "🚀 Play Game",
+  "splashImageUrl": "https://onchain2048.vercel.app/splash.png",
+  "splashBackgroundColor": "#f5f0ec",
+  "requiredChains": ["eip155:8453"],
+  "requiredCapabilities": ["wallet.getEthereumProvider", "actions.composeCast", "notifications.schedule"],
+  "accountAssociation": {
+    "header": "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
+    "payload": "{\"domain\":\"onchain2048.vercel.app\"}",
+    "signature": "0xYourSignatureHere"
+  }
+}
