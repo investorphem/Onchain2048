@@ -36,7 +36,7 @@ const ABI = [
 ];
 */
 
-// Wagmi Config with Viem
+// Wagmi Config
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
@@ -57,26 +57,27 @@ function App() {
   const [gameOver, setGameOver] = useState(false);
   const [error, setError] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
+  const [contract, setContract] = useState(null);
   const { address } = useAccount();
   const { switchChain } = useSwitchChain();
 
-  // Persistent provider
+  // Persistent provider and signer
   const [provider, setProvider] = useState(null);
   useEffect(() => {
     async function initProvider() {
       try {
         const ethProvider = await sdk.wallet.getEthereumProvider({ chainId: base.id });
         const web3Provider = new ethers.BrowserProvider(ethProvider);
-        setProvider(web3Provider);
         await web3Provider.send('wallet_switchEthereumChain', [{ chainId: '0x2105' }]);
+        const signer = await web3Provider.getSigner();
+        setProvider(web3Provider);
+        setContract(new ethers.Contract(CONTRACT_ADDRESS, ABI, signer));
       } catch (err) {
         setError('Wallet connection failed: ' + err.message);
       }
     }
     if (!provider) initProvider(); // Connect once
   }, []);
-
-  const contract = provider ? new ethers.Contract(CONTRACT_ADDRESS, ABI, await provider.getSigner()) : null;
 
   // Initialize
   useEffect(() => {
