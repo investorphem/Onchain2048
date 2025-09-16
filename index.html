@@ -2,133 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>On-Chain 2048 on Base</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        #game { display: grid; grid-template-columns: repeat(4, 100px); grid-gap: 5px; margin: 20px auto; }
-        .tile { width: 100px; height: 100px; background: #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; }
-        .tile-2 { background: #eee4da; }
-        .tile-4 { background: #ede0c8; }
-        .tile-8 { background: #f2b179; }
-        .tile-16 { background: #f59563; }
-        .tile-32 { background: #f67c5f; }
-        .tile-64 { background: #f65e3b; }
-        .tile-128 { background: #edcf72; }
-        .tile-256 { background: #edcc61; }
-        .tile-512 { background: #edc850; }
-        .tile-1024 { background: #edc53f; }
-        .tile-2048 { background: #edc22e; }
-    </style>
-    <script src="https://cdn.ethers.io/lib/ethers-5.7.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>On-Chain 2048 Mini App</title>
+    <!-- MiniAppEmbed Metadata (required for Farcaster discovery) -->
+    <meta property="fc:miniapp" content='{"version":"1","name":"On-Chain 2048","iconUrl":"https://your-domain.com/icon.png","homeUrl":"https://your-domain.com/","imageUrl":"https://your-domain.com/og-image.png","buttonTitle":"Play 2048","splashImageUrl":"https://your-domain.com/splash.png","splashBackgroundColor":"#f5f0ec","requiredChains":["eip155:8453"],"requiredCapabilities":["wallet.getEthereumProvider","actions.composeCast"]}' />
+    <meta property="og:title" content="On-Chain 2048 on Base" />
+    <meta property="og:description" content="Play 2048 where every move is an on-chain transaction!" />
+    <meta property="og:image" content="https://your-domain.com/og-image.png" />
+    <script type="module" src="/src/main.jsx"></script>
 </head>
 <body>
-    <h1>On-Chain 2048</h1>
-    <p>Score: <span id="score">0</span></p>
-    <div id="game"></div>
-    <button onclick="resetGame()">Reset Game</button>
-    <p>Use arrow keys to move. Each move sends a transaction to Base Mainnet!</p>
-
-    <script>
-        const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f385F53152BF';
-        const ABI = [
-            // Paste the ABI here from compilation, or abbreviated:
-            "function resetGame()",
-            "function move(uint256 direction)",
-            "function getBoard() view returns (uint256[16])",
-            "function score() view returns (uint256)",
-            "function gameOver() view returns (bool)",
-            "event MoveMade(uint256 direction, uint256 newScore)",
-            "event NewTileAdded(uint256 position, uint256 value)"
-        ];
-
-        let provider, signer, contract;
-
-        async function init() {
-            if (window.ethereum) {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                await provider.send("eth_requestAccounts", []);
-                signer = provider.getSigner();
-                contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
-
-                // Switch to Base Mainnet if not already
-                try {
-                    await window.ethereum.request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: '0x2105' }], // 8453 in hex
-                    });
-                } catch (switchError) {
-                    if (switchError.code === 4902) {
-                        await window.ethereum.request({
-                            method: 'wallet_addEthereumChain',
-                            params: [{
-                                chainId: '0x2105',
-                                chainName: 'Base Mainnet',
-                                rpcUrls: ['https://mainnet.base.org'],
-                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                                blockExplorerUrls: ['https://basescan.org']
-                            }],
-                        });
-                    }
-                }
-
-                await updateBoard();
-                document.addEventListener('keydown', handleKey);
-            } else {
-                alert('Please install MetaMask!');
-            }
-        }
-
-        async function updateBoard() {
-            const board = await contract.getBoard();
-            const scoreEl = document.getElementById('score');
-            scoreEl.textContent = await contract.score();
-            const gameDiv = document.getElementById('game');
-            gameDiv.innerHTML = '';
-            for (let i = 0; i < 16; i++) {
-                const tile = document.createElement('div');
-                const val = board[i].toNumber();
-                tile.className = `tile tile-${val}`;
-                tile.textContent = val > 0 ? val : '';
-                gameDiv.appendChild(tile);
-            }
-            if (await contract.gameOver()) {
-                alert('Game Over!');
-            }
-        }
-
-        async function makeMove(direction) {
-            try {
-                const tx = await contract.move(direction);
-                await tx.wait();
-                await updateBoard();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        async function resetGame() {
-            try {
-                const tx = await contract.resetGame();
-                await tx.wait();
-                await updateBoard();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function handleKey(e) {
-            let direction;
-            switch (e.key) {
-                case 'ArrowUp': direction = 0; break;
-                case 'ArrowDown': direction = 1; break;
-                case 'ArrowLeft': direction = 2; break;
-                case 'ArrowRight': direction = 3; break;
-                default: return;
-            }
-            makeMove(direction);
-        }
-
-        init();
-    </script>
+    <div id="root"></div>
+    <style>
+        /* Same CSS as before for tiles */
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #game { display: grid; grid-template-columns: repeat(4, 100px); grid-gap: 5px; margin: 20px auto; justify-content: center; }
+        .tile { width: 100px; height: 100px; background: #ccc; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 5px; }
+        /* Add classes for tile colors as before: .tile-2 { background: #eee4da; } etc. */
+    </style>
 </body>
 </html>
