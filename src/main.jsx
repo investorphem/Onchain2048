@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createConfig, WagmiConfig, useAccount, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
+import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { createPublicClient, http } from 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
+import { useSwipeable } from 'react-swipeable';
+import { farcasterMiniApp as miniAppConnector } from '@farcaster/miniapp-wagmi-connector';
 
 // Contract details
 const CONTRACT_ADDRESS = '0x2B204747b90e49791674B7b89F464476C9670eD7';
@@ -23,7 +25,7 @@ const ABI = [
   "event HighScoreUpdated(address indexed player, uint256 newHighScore)"
 ];
 
-// For single-player contract (uncomment if 0x2B204747... is single-player):
+// For single-player contract (uncomment if needed):
 /*
 const ABI = [
   "function resetGame()",
@@ -36,7 +38,7 @@ const ABI = [
 ];
 */
 
-// Wagmi Config
+// Wagmi Config with Farcaster Mini App Connector
 const publicClient = createPublicClient({
   chain: base,
   transport: http(),
@@ -45,6 +47,7 @@ const publicClient = createPublicClient({
 const config = createConfig({
   chains: [base],
   client: ({ chain }) => publicClient,
+  connectors: [miniAppConnector()],
 });
 
 const queryClient = new QueryClient();
@@ -58,33 +61,38 @@ function App() {
   const [error, setError] = useState(null);
   const [leaderboard, setLeaderboard] = useState([]);
   const [contract, setContract] = useState(null);
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect();
   const { switchChain } = useSwitchChain();
 
-  // Persistent provider and signer
+  // Persistent provider and signer (now handled by Wagmi connector)
   const [provider, setProvider] = useState(null);
   useEffect(() => {
     async function initProvider() {
       try {
+        // Switch to Base chain
+        switchChain({ chainId: base.id });
+        // Get Ethereum provider from SDK for Ethers integration
         const ethProvider = await sdk.wallet.getEthereumProvider({ chainId: base.id });
         const web3Provider = new ethers.BrowserProvider(ethProvider);
-        await web3Provider.send('wallet_switchEthereumChain', [{ chainId: '0x2105' }]);
-        const signer = await web3Provider.getSigner();
         setProvider(web3Provider);
+        const signer = await web3Provider.getSigner();
         setContract(new ethers.Contract(CONTRACT_ADDRESS, ABI, signer));
       } catch (err) {
-        setError('Wallet connection failed: ' + err.message);
+        setError('Wallet setup failed: ' + err.message);
       }
     }
-    if (!provider) initProvider(); // Connect once
-  }, []);
+    if (isConnected && !provider) initProvider(); // Init after connection
+  }, [isConnected]);
 
-  // Initialize
+  // Initialize app and prompt to add Mini App
   useEffect(() => {
     sdk.actions.ready();
-    if (address && contract) updateGameState();
+    // Prompt to add Mini App immediately
+    sdk.actions.addMiniApp();
+    if (isConnected && contract) updateGameState();
     updateLeaderboard();
-  }, [address, contract]);
+  }, [isConnected, contract]);
 
   // Game state
   const updateGameState = async () => {
@@ -145,7 +153,7 @@ function App() {
 
   useWaitForTransactionReceipt({
     hash: moveData?.hash,
-    onSuccess: async (receipt) => {
+    onSuccess: async () => {
       await updateGameState();
       await updateLeaderboard();
       sdk.haptics.impactOccurred('light');
@@ -176,21 +184,20 @@ function App() {
     }
   };
 
-  const handleKey = (e) => {
-    if (moveLoading) return;
-    let dir;
-    if (e.key === 'ArrowUp') dir = 0;
-    else if (e.key === 'ArrowDown') dir = 1;
-    else if (e.key === 'ArrowLeft') dir = 2;
-    else if (e.key === 'ArrowRight') dir = 3;
-    else return;
-    makeMove(dir);
-  };
+  // Swipe handlers
+  const handlers = useSwipeable({
+    onSwipedUp: () => !moveLoading && makeMove(0), // Up
+    onSwipedDown: () => !moveLoading && makeMove(1), // Down
+    onSwipedLeft: () => !moveLoading && makeMove(2), // Left
+    onSwipedRight: () => !moveLoading && makeMove(3), // Right
+    delta: 10, // Minimum swipe distance
+    preventDefaultTouchmoveEvent: true, // Prevent page scrolling
+  });
 
-  useEffect(() => {
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  }, [board, moveLoading]);
+  // Connect button handler
+  const handleConnect = () => {
+    connect({ connector: miniAppConnector() });
+  };
 
   const tileClasses = (i, val) => {
     let classes = `tile tile-${val}`;
@@ -200,24 +207,25 @@ function App() {
   };
 
   const tileStyle = (i) => ({
-    transform: `translate(${(i % 4) * 105}px, ${Math.floor(i / 4) * 105}px)`,
+    transform: `translate(${(i % 4) * (window.innerWidth <= 500 ? 23 : 100)}px, ${Math.floor(i / 4) * (window.innerWidth <= 500 ? 23 : 100)}px)`,
   });
 
   return (
     <div>
       <h1>On-Chain 2048 on Base</h1>
       <p>Score: {score} | High Score: {highScore} | Wallet: {address ? `${address.slice(0,6)}...` : 'Connecting...'}</p>
+      {!isConnected && <button onClick={handleConnect}>Connect Wallet</button>}
       {error && <p className="error">{error}</p>}
       {gameOver && <p>Game Over! Final Score: {score}</p>}
-      <div id="game">
+      <div id="game" {...handlers}>
         {board.map((val, i) => (
           <div key={i} className={tileClasses(i, val)} style={tileStyle(i)}>
             {val > 0 ? val : ''}
           </div>
         ))}
       </div>
-      <button onClick={resetGame} disabled={moveLoading}>Start/Reset Game</button>
-      <p>Use arrow keys. Each move = on-chain tx on Base!</p>
+      <button onClick={resetGame} disabled={moveLoading || !isConnected}>Start/Reset Game</button>
+      <p>Swipe to move tiles. Each move = on-chain tx on Base!</p>
       <div id="leaderboard">
         <h2>Leaderboard (Top 10)</h2>
         <ul>
