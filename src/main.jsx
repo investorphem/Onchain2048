@@ -10,7 +10,7 @@ import { useSwipeable } from 'react-swipeable';
 import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 
 // Contract details - SINGLE-PLAYER ABI (matches deployed contract)
-const CONTRACT_ADDRESS = '0x2B204747b90e49791674B7b89F464476C9670eD7';
+const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f385F53152BF';
 const ABI = [
   "function resetGame()",
   "function move(uint256 direction)",
