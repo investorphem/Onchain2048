@@ -209,7 +209,7 @@ function App() {
           </div>
         ))}
       </div>
-      <button onClick={resetGame} disabled={moveLoading || !isConnected}>Start/Reset Game</button>
+      <button onClick={resetGame} disabled={moveLoading || !isConnected}Start/Reset Game</button>
       <p>Swipe to move tiles. Each move = on-chain tx on Base!</p>
       <div id="leaderboard">
         <h2>Leaderboard (Top 10)</h2>
