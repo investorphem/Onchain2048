@@ -147,7 +147,7 @@ function App() {
       setError('Cannot move: Game over or wallet not connected');
       return;
     }
-    try {
+    try 
       moveWrite({ args: [direction], gasLimit: 150000n });
     } catch (err) {
       setError('Move failed: ' + err.message);
