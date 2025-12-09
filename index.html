@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>On-Chain 2048 Mini App</title>
-    <meta property="fc:miniapp" content='{"vesion":"1","name":"On-Chain 2048","iconUrl":"https://onchain2048.ercel.app/icon.png","homeUrl":"https://onchain2048.vercel.app/","imageUrl":"https://onchain2048.vercel.app/og-image.png","buttonTitle":"Play 2048","splashmageUrl":"https://onchain2048.vercel.app/splas.png","splashBackgroundColor":"#f5f0ec","requiredChains":["eip155:8453"],"requiredCapabilities":["wallet.getEthereumProvider","actions.composeCast","notifications.schedule"]}' />
+    <meta property="fc:miniapp" content='{"version":"1","name":"On-Chain 2048","iconUrl":"https://onchain2048.vercel.app/icon.png","homeUrl":"https://onchain2048.vercel.app/","imageUrl":"https://onchain2048.vercel.app/og-image.png","buttonTitle":"Play 2048","splashImageUrl":"https://onchain2048.vercel.app/splash.png","splashBackgroundColor":"#f5f0ec","requiredChains":["eip155:8453"],"requiredCapabilities":["wallet.getEthereumProvider","actions.composeCast","notifications.schedule"]}' />
     <meta property="og:title" content="On-Chain 2048 on Base" />
     <meta property="og:description" content="Play 2048 where every move is an on-chain transaction!" />
     <meta property="og:image" content="https://onchain2048.vercel.app/og-image.png" />
@@ -28,7 +28,7 @@
         .tile-1024 { background: #edc53f; }
         .tile-2048 { background: #edc22e; }
         .tile.appear { animation: appear 0.2s ease-in-out; }
-        .tile.erge { animation: merge 0.2s ease-in-out; }
+        .tile.merge { animation: merge 0.2s ease-in-out; }
         @keyframes appear {
             from { transform: scale(0); }
             to { transform: scale(1); }
@@ -39,7 +39,7 @@
             100% { transform: scale(1); }
         }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #8f7a66; color: white; border: none; border-radius: 5px; margin: 10px; }
-        buton:disabled { opacity: 0.5; cursor: not-allowed; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
         p { font-size: 14px; color: #776e65; }
         #leaderboard { margin-top: 20px; }
         #leaderboard ul { list-style: none; padding: 0; }
