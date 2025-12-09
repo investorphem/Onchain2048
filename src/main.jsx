@@ -22,7 +22,7 @@ const ABI = [
 ];
 
 // Wagmi Config with Farcaster Frame Connector
-const publicClient = createPublicClient({
+const publicClient = createPublicCliet({
   chain: base,
   transport: http(),
 });
