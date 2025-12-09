@@ -14,7 +14,7 @@ const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f385F53152BF';
 const ABI = [
   "function resetGame()",
   "function move(uint256 direction)",
-  "function getBoard() view returns (uint256[16])",
+  "function getBoard() view return (uint256[16])",
   "function score() view returns (uint256)",
   "function gameOver() view returns (bool)",
   "event MoveMade(uint256 direction, uint256 newScore)",
