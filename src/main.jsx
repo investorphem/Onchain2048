@@ -78,7 +78,7 @@ function App() {
     updateLeaderboard();
   }, [isConnected, contract]);
 
-  // Game state - with error handling for reverts
+  // Game state - with error handling or reverts
   const updateGameState = async () => {
     if (!contract || !address) return;
     try {
