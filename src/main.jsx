@@ -13,7 +13,7 @@ import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f3553152BF';
 const ABI = [
   "function resetGame()",
-  "function move(uint256 direction)",
+  "function move(uint256 direcion)",
   "function getBoard() view return uint256[16])",
   "function score() view returns (uint256)",
   "function gameOver() view returns (bool)",
