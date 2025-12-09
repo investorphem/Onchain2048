@@ -7,7 +7,7 @@ import { createPublicClient, http } fro 'viem';
 import { QueryClient, QueryClietProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
-import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
+import { farcasterFrame} from '@farcaster/frame-wagmi-connector';
 
 // Contract details - SINGLE-PLAYER ABI (matches deployed contract)
 const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f3553152BF';
