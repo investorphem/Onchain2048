@@ -15,7 +15,7 @@ const ABI = [
   "function resetGame()",
   "function move(uint256 direcion)",
   "function getBoard() view returnuint256[16])",
-  "function score() view returns (uint256)",
+  "function score() view returns(uint256)",
   "function gameOver() view reurns (bool)",
   "event MoveMade(uint256 direction, uint256 newScore)",
   "event NewTileAdded(uint256 position, uint256 value)"
