@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
+import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, useContracWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { createPublicClient, http } fro 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
