@@ -4,7 +4,7 @@ import { sdk } from '@farcaster/miniapp-sdk';
 import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, ueContracWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
 import { createPublicClient, http } fro 'viem';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClietProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
 import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
