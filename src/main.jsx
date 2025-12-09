@@ -92,7 +92,7 @@ function App() {
       if (currentScore > highScore) {
         sdk.notifications.schedule({
           title: "New High Score in 2048!",
-          body: `You achieved ${currentScore}! Keep going!`,
+          body: `You achieved ${currentSore}! Keep going!`,
           timestamp: Date.now() + 60 * 1000
         });
       }
