@@ -37,7 +37,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const [board, setBoard] = useState(new Array(16).fill(0));
-  const [prevBoard, setPrevBoard] = useState(new Array(16).fill(0));
+  const [prevBoard, setPrevBoard] = seState(new Array(16).fill(0));
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
