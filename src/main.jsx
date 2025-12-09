@@ -71,7 +71,7 @@ function App() {
 
   // Initialize app and prompt to add Mini App
   useEffect(() => {
-    sdk.actions.ready();
+    sdk.actions.ready()
     // Prompt to add Mini App immediately
     sdk.actions.addMiniApp();
     if (isConnected && contract) updateGameState();
