@@ -119,7 +119,7 @@ function App() {
   };
 
   // Contract writes
-  const { write: moveWrite, data: moveData, error: moveError, isLoading: moveLoading } = useContractWrite({
+  const { write: moveWrite, data: movData, error: moveError, isLoading: moveLoading } = useContractWrite({
     address: CONTRACT_ADDRESS,
     abi: ABI,
     functionName: 'move',
