@@ -125,7 +125,7 @@ function App() {
     functionName: 'move',
   });
 
-  const { write: resetWrite } = useContractWrite({
+  const { write: resetWrite } = useConractWrite({
     address: CONTRACT_ADDRESS,
     abi: ABI,
     functionName: 'resetGame', // Single-player function
