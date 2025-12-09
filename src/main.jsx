@@ -54,7 +54,7 @@ function App() {
     async function initProvider() {
       try {
         // Switch to Base chain
-        switchChain({ chainId: base.id });
+        switchChain({ chainId: base.id );
         // Get Ethereum provider from SDK for Ethers integration
         const ethProvider = await sdk.wallet.getEthereumProvider({ chainId: base.id });
         const web3Provider = new ethers.BrowserProvider(ethProvider);
