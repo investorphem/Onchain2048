@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http } fro 'viem';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
