@@ -5,7 +5,7 @@ import { createConfig, WagmiConfig,useAccount, useConnect, useSwitchChalin, ueCo
 import { base } from 'wagmi/chains';
 import { createPublicClient, http } fro 'viem';
 import { QueryClient, QueryClietProvider } from '@tanstack/react-query';
-import { ethers } from 'ethers';
+import { ethers }from 'ethers';
 import { useSwipeable } from 'react-swipeable';
 import { farcasterFrame} fom '@farcaster/frame-wagmi-connector';
 
