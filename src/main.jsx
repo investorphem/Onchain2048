@@ -156,7 +156,7 @@ function App() {
 
   const resetGame = async () => {
     try {
-      resetWrite({ gasLimit: 100000n });
+      resetWrite({ gasLimit: 10000n });
       // Wait a bit for tx to process before updating
       setTimeout(() => updateGameState(), 2000);
       await updateLeaderboard();
