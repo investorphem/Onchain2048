@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { sdk } from '@farcaster/miniapp-sdk';
-import { createConfig, WagmiConfig,useAccount, useConnect, useSwitchChalin, ueContracWrite, useWaitForTransactionReceipt } from 'wagmi';
+import { createConfig, WagmiConfig, useAccount, useConnect, useSwitchChain, useContractWrite, useWaitForTransactionReceipt } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { createPublicClient, http } fro 'viem';
-import { QueryClient, QueryClietProvider } from '@tanstack/react-query';
-import { ethers }from 'ethers';
+import { createPublicClient, http } from 'viem';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ethers } from 'ethers';
 import { useSwipeable } from 'react-swipeable';
-import { farcasterFrame} fom '@farcaster/frame-wagmi-connector';
+import { farcasterFrame } from '@farcaster/frame-wagmi-connector';
 
 // Contract details - SINGLE-PLAYER ABI (matches deployed contract)
-const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f3553152BF';
+const CONTRACT_ADDRESS = '0xE550f498C08b7d8C7b8CD403f296f385F53152BF';
 const ABI = [
   "function resetGame()",
-  "function move(uint256 direcion)",
-  "function getBoard() view returnuint256[16])",
-  "function score() view returns(uint256)",
-  "function gameOver() view reurns (bool)",
+  "function move(uint256 direction)",
+  "function getBoard() view returns (uint256[16])",
+  "function score() view returns (uint256)",
+  "function gameOver() view returns (bool)",
   "event MoveMade(uint256 direction, uint256 newScore)",
   "event NewTileAdded(uint256 position, uint256 value)"
 ];
 
 // Wagmi Config with Farcaster Frame Connector
-const publicClient = createPublicCliet({
+const publicClient = createPublicClient({
   chain: base,
   transport: http(),
 });
@@ -37,7 +37,7 @@ const queryClient = new QueryClient();
 
 function App() {
   const [board, setBoard] = useState(new Array(16).fill(0));
-  const [prevBoard, setPrevBoard] = seState(new Array(16).fill(0));
+  const [prevBoard, setPrevBoard] = useState(new Array(16).fill(0));
   const [score, setScore] = useState(0);
   const [highScore, setHighScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
@@ -54,7 +54,7 @@ function App() {
     async function initProvider() {
       try {
         // Switch to Base chain
-        switchChain({ chainId: base.id );
+        switchChain({ chainId: base.id });
         // Get Ethereum provider from SDK for Ethers integration
         const ethProvider = await sdk.wallet.getEthereumProvider({ chainId: base.id });
         const web3Provider = new ethers.BrowserProvider(ethProvider);
@@ -71,14 +71,14 @@ function App() {
 
   // Initialize app and prompt to add Mini App
   useEffect(() => {
-    sdk.actions.ready()
+    sdk.actions.ready();
     // Prompt to add Mini App immediately
     sdk.actions.addMiniApp();
     if (isConnected && contract) updateGameState();
     updateLeaderboard();
   }, [isConnected, contract]);
 
-  // Game state - with error handling or reverts
+  // Game state - with error handling for reverts
   const updateGameState = async () => {
     if (!contract || !address) return;
     try {
@@ -92,7 +92,7 @@ function App() {
       if (currentScore > highScore) {
         sdk.notifications.schedule({
           title: "New High Score in 2048!",
-          body: `You achieved ${currentSore}! Keep going!`,
+          body: `You achieved ${currentScore}! Keep going!`,
           timestamp: Date.now() + 60 * 1000
         });
       }
@@ -119,13 +119,13 @@ function App() {
   };
 
   // Contract writes
-  const { write: moveWrite, data: movData, error: moveError, isLoading: moveLoading } = useContractWrite({
+  const { write: moveWrite, data: moveData, error: moveError, isLoading: moveLoading } = useContractWrite({
     address: CONTRACT_ADDRESS,
     abi: ABI,
     functionName: 'move',
   });
 
-  const { write: resetWrite } = useConractWrite({
+  const { write: resetWrite } = useContractWrite({
     address: CONTRACT_ADDRESS,
     abi: ABI,
     functionName: 'resetGame', // Single-player function
@@ -147,7 +147,7 @@ function App() {
       setError('Cannot move: Game over or wallet not connected');
       return;
     }
-    try 
+    try {
       moveWrite({ args: [direction], gasLimit: 150000n });
     } catch (err) {
       setError('Move failed: ' + err.message);
@@ -156,7 +156,7 @@ function App() {
 
   const resetGame = async () => {
     try {
-      resetWrite({ gasLimit: 10000n });
+      resetWrite({ gasLimit: 100000n });
       // Wait a bit for tx to process before updating
       setTimeout(() => updateGameState(), 2000);
       await updateLeaderboard();
@@ -209,7 +209,7 @@ function App() {
           </div>
         ))}
       </div>
-      <button onClick={resetGame} disabled={moveLoading || !isConnected}Start/Reset Game</button>
+      <button onClick={resetGame} disabled={moveLoading || !isConnected}>Start/Reset Game</button>
       <p>Swipe to move tiles. Each move = on-chain tx on Base!</p>
       <div id="leaderboard">
         <h2>Leaderboard (Top 10)</h2>
