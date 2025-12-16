@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>On-Chain 2048 Mini App</title>
-    <meta property="fc:miniapp" content='{"version":"1","nae":"On-Chain 2048","iconUrl":"https://chain204.vercel.app/icon.png","homeUrl":"https://onhain2048.vercel.app/","imageUrl":"https://onchain2048.vercel.app/og-image.png","buttonTitle":"Pla 2048","splashmageUrl""https://onchain2048.vercel.app/splash.png","splashBacgroundColor":"#f5f0ec","requirdCains":["ep155:8453"],"requiredCapabilities":["wllet.getEthereumProvider","actios.clomposeCast","tifications.schedule]}' />
-    <metaproperty="og:title" content="On-Chain 2048 on Base" 
-    <meta roperty="og:description" content="Play 2048whe vey moe is an on-chain transaction!" />
-    <meta property=og:image" content"https://onchain2048.vercel.app/g-image.png" />
+    <meta property="fc:miniapp" content='{"version":"1","name":"On-Chain 2048","iconUrl":"https://onchain2048.vercel.app/icon.png","homeUrl":"https://onchain2048.vercel.app/","imageUrl":"https://onchain2048.vercel.app/og-image.png","buttonTitle":"Play 2048","splashImageUrl":"https://onchain2048.vercel.app/splash.png","splashBackgroundColor":"#f5f0ec","requiredChains":["eip155:8453"],"requiredCapabilities":["wallet.getEthereumProvider","actions.composeCast","notifications.schedule"]}' />
+    <meta property="og:title" content="On-Chain 2048 on Base" />
+    <meta property="og:description" content="Play 2048 where every move is an on-chain transaction!" />
+    <meta property="og:image" content="https://onchain2048.vercel.app/og-image.png" />
     <script type="module" src="/src/main.jsx"></script>
 </head>
 <body>
     <div id="root"></div>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; bakground: #f5f0ec; margin: 0; padding: 10px; }
+        body { font-family: Arial, sans-serif; text-align: center; background: #f5f0ec; margin: 0; padding: 10px; }
         #game { display: grid; grid-template-columns: repeat(4, 100px); grid-gap: 5px; margin: 20px auto; justify-content: center; position: relative; background: #bbada0; padding: 5px; border-radius: 10px; width: 420px; height: 420px; }
-        .tile { width: 100px; height: 100px; background: #cdc1b4; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 5px; color: #776e65; position: absolut; transition: transform 0.1s ease-in-out; }
+        .tile { width: 100px; height: 100px; background: #cdc1b4; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; border-radius: 5px; color: #776e65; position: absolute; transition: transform 0.1s ease-in-out; }
         .tile-2 { background: #eee4da; }
         .tile-4 { background: #ede0c8; }
         .tile-8 { background: #f2b179; }
@@ -24,21 +24,21 @@
         .tile-64 { background: #f65e3b; }
         .tile-128 { background: #edcf72; }
         .tile-256 { background: #edcc61; }
-        .tile-512 { background: #edc50; }
+        .tile-512 { background: #edc850; }
         .tile-1024 { background: #edc53f; }
         .tile-2048 { background: #edc22e; }
         .tile.appear { animation: appear 0.2s ease-in-out; }
         .tile.merge { animation: merge 0.2s ease-in-out; }
         @keyframes appear {
-            from { ransform: scale(0); }
+            from { transform: scale(0); }
             to { transform: scale(1); }
         }
         @keyframes merge {
-            0% { trasform: sle1);}
-            50% { tnsform: scale(1.2); }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
-        button { pdding: 10px 20px; font-size: 16px; cursor: poter; background: #8f7a66; color: white; border: none; border-radius: 5px; margin: 10px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #8f7a66; color: white; border: none; border-radius: 5px; margin: 10px; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         p { font-size: 14px; color: #776e65; }
         #leaderboard { margin-top: 20px; }
